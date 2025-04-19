@@ -14,11 +14,24 @@ program
   )
   .version(version)
   .option('-v, --verbose', 'show detailed output for all operations')
+  .option('-d, --dir <directory>', 'specify working directory')
   .hook('preAction', (thisCommand) => {
     if (thisCommand.opts().verbose) {
       logger.setVerbosity('verbose');
     } else {
       logger.setVerbosity('normal');
+    }
+
+    if (thisCommand.opts().dir) {
+      try {
+        process.chdir(thisCommand.opts().dir);
+        logger.detail(`Changed working directory to: ${process.cwd()}`);
+      } catch (error) {
+        logger.error(
+          `Failed to change directory: ${error instanceof Error ? error.message : 'unknown error'}`
+        );
+        process.exit(1);
+      }
     }
   });
 
